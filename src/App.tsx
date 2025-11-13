@@ -1,9 +1,10 @@
 import { useState } from 'react'
 import { CodeEditor } from './components/CodeEditor'
-import { Preview } from './components/Preview'
+import { ReadOnlyEditor } from './components/ReadOnlyEditor'
+import { PreviewSection } from './components/PreviewSection'
 import './App.css'
 
-const INITIAL_CODE = `function Welcome() {
+const EXAMPLE_CODE = `function Welcome() {
   const [count, setCount] = useState(0)
 
   return (
@@ -32,23 +33,38 @@ const INITIAL_CODE = `function Welcome() {
 const App = Welcome
 `
 
+const INITIAL_PRACTICE_CODE = `function Welcome() {
+  // ここにコードを入力してください
+  return (
+    <div>
+      <h1>練習中...</h1>
+    </div>
+  )
+}
+
+const App = Welcome
+`
+
 function App() {
-  const [code, setCode] = useState(INITIAL_CODE)
+  const [practiceCode, setPracticeCode] = useState(INITIAL_PRACTICE_CODE)
 
   return (
     <div className="app">
       <header className="app__header">
         <h1>React Sandbox</h1>
-        <p>React を練習しよう</p>
+        <p>お手本を見ながら React を練習しよう</p>
       </header>
       <div className="app__container">
-        <div className="app__editor">
-          <h2 className="app__section-title">エディタ</h2>
-          <CodeEditor value={code} onChange={setCode} />
+        <div className="app__editors">
+          <div className="app__example">
+            <ReadOnlyEditor value={EXAMPLE_CODE} title="お手本" />
+          </div>
+          <div className="app__practice">
+            <CodeEditor value={practiceCode} onChange={setPracticeCode} title="練習エディタ" />
+          </div>
         </div>
         <div className="app__preview">
-          <h2 className="app__section-title">プレビュー</h2>
-          <Preview code={code} />
+          <PreviewSection exampleCode={EXAMPLE_CODE} practiceCode={practiceCode} />
         </div>
       </div>
     </div>
