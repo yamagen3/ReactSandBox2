@@ -23,8 +23,9 @@ export const Preview: React.FC<PreviewProps> = ({ code, error }) => {
       <html>
         <head>
           <meta charset="UTF-8">
-          <script crossorigin src="https://unpkg.com/react@18/umd/react.development.js"></script>
-          <script crossorigin src="https://unpkg.com/react-dom@18/umd/react-dom.development.js"></script>
+          <meta name="viewport" content="width=device-width, initial-scale=1.0">
+          <script crossorigin src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
+          <script crossorigin src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
           <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
           <style>
             body {
@@ -39,28 +40,44 @@ export const Preview: React.FC<PreviewProps> = ({ code, error }) => {
           </style>
         </head>
         <body>
-          <div id="root"></div>
+          <div id="root">Loading...</div>
           <script type="text/babel">
-            const { useState, useEffect } = React;
+            (function() {
+              try {
+                // React と ReactDOM の読み込み確認
+                if (typeof React === 'undefined' || typeof ReactDOM === 'undefined') {
+                  document.getElementById('root').innerHTML =
+                    '<div style="color: red; padding: 16px;">React ライブラリの読み込みに失敗しました</div>';
+                  return;
+                }
 
-            try {
-              ${code}
+                const { useState, useEffect } = React;
 
-              const rootElement = document.getElementById('root');
-              const root = ReactDOM.createRoot(rootElement);
+                ${code}
 
-              // デフォルトエクスポートがある場合はそれを使用
-              if (typeof App !== 'undefined') {
-                root.render(<App />);
-              } else if (typeof Welcome !== 'undefined') {
-                root.render(<Welcome />);
-              } else {
-                root.render(<div>コンポーネントが定義されていません</div>);
+                const rootElement = document.getElementById('root');
+                const root = ReactDOM.createRoot(rootElement);
+
+                // デフォルトエクスポートがある場合はそれを使用
+                if (typeof App !== 'undefined') {
+                  root.render(React.createElement(App));
+                } else if (typeof Welcome !== 'undefined') {
+                  root.render(React.createElement(Welcome));
+                } else {
+                  root.render(React.createElement('div', null, 'コンポーネントが定義されていません'));
+                }
+              } catch (err) {
+                console.error('Preview Error:', err);
+                const rootEl = document.getElementById('root');
+                if (rootEl) {
+                  rootEl.innerHTML =
+                    '<div style="color: red; padding: 16px; white-space: pre-wrap;">エラー: ' +
+                    err.message +
+                    (err.stack ? '\\n\\n' + err.stack : '') +
+                    '</div>';
+                }
               }
-            } catch (err) {
-              document.getElementById('root').innerHTML =
-                '<div style="color: red; padding: 16px;">エラー: ' + err.message + '</div>';
-            }
+            })();
           </script>
         </body>
       </html>
@@ -98,7 +115,7 @@ export const Preview: React.FC<PreviewProps> = ({ code, error }) => {
         ref={iframeRef}
         className="preview__iframe"
         title="Preview"
-        sandbox="allow-scripts"
+        sandbox="allow-scripts allow-same-origin"
         data-testid="preview-iframe"
       />
     </div>
