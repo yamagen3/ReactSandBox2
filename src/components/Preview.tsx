@@ -112,6 +112,7 @@ export const Preview: React.FC<PreviewProps> = ({ code, error }) => {
   return (
     <div className="preview" data-testid="preview-container">
       <iframe
+        key={code}
         ref={iframeRef}
         className="preview__iframe"
         title="Preview"
