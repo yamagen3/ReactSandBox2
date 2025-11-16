@@ -40,6 +40,7 @@
   flex-direction: column;
   background-color: #ffffff;
   overflow: hidden;
+  height: 100%;
 }
 
 /* 右側：プレビュー領域（30%に縮小） */
@@ -49,6 +50,7 @@
   flex-direction: column;
   background-color: #ffffff;
   overflow: hidden;
+  height: 100%;
 }
 
 /* レスポンシブ対応 */
