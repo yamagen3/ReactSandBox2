@@ -38,11 +38,18 @@
   flex: 1;
   position: relative;
   overflow: hidden;
+  display: flex;
+  background-color: #1e1e1e;
 }
 
 .code-editor__textarea {
-  flex: 1;
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
   width: 100%;
+  height: 100%;
   padding: 16px;
   font-family: 'Courier New', Courier, monospace;
   font-size: 14px;
@@ -50,9 +57,10 @@
   border: none;
   outline: none;
   resize: none;
-  background-color: #1e1e1e;
+  background-color: transparent;
   color: #d4d4d4;
   tab-size: 2;
+  z-index: 2;
 }
 
 .code-editor__textarea::placeholder {
@@ -70,10 +78,9 @@
   left: 0;
   right: 0;
   bottom: 0;
-  background-color: rgba(30, 30, 30, 0.65);
-  backdrop-filter: blur(1px);
+  background-color: #1e1e1e;
   pointer-events: none;
-  z-index: 10;
+  z-index: 1;
   overflow: auto;
 }
 
@@ -83,7 +90,7 @@
   font-family: 'Courier New', Courier, monospace;
   font-size: 14px;
   line-height: 1.5;
-  color: rgba(255, 215, 0, 0.35);
+  color: rgba(255, 215, 0, 0.4);
   white-space: pre-wrap;
   word-wrap: break-word;
   tab-size: 2;
