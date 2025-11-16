@@ -1,6 +1,5 @@
 import { useState } from 'react'
 import { CodeEditor } from './components/CodeEditor'
-import { ReadOnlyEditor } from './components/ReadOnlyEditor'
 import { PreviewSection } from './components/PreviewSection'
 import './App.css'
 
@@ -55,16 +54,16 @@ function App() {
         <p>お手本を見ながら React を練習しよう</p>
       </header>
       <div className="app__container">
-        <div className="app__editors">
-          <div className="app__example">
-            <ReadOnlyEditor value={EXAMPLE_CODE} title="お手本" />
-          </div>
-          <div className="app__practice">
-            <CodeEditor value={practiceCode} onChange={setPracticeCode} title="練習エディタ" />
-          </div>
+        <div className="app__editor-area">
+          <CodeEditor
+            value={practiceCode}
+            onChange={setPracticeCode}
+            title="練習エディタ"
+            exampleCode={EXAMPLE_CODE}
+          />
         </div>
         <div className="app__preview">
-          <PreviewSection exampleCode={EXAMPLE_CODE} practiceCode={practiceCode} />
+          <PreviewSection code={practiceCode} />
         </div>
       </div>
     </div>
