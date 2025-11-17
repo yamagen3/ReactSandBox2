@@ -46,41 +46,86 @@ const App = Welcome
 
 function App() {
   const [practiceCode, setPracticeCode] = useState(INITIAL_PRACTICE_CODE)
-  const [editorWidth, setEditorWidth] = useState(70) // パーセンテージ
+  const [editorWidth, setEditorWidth] = useState(70) // デスクトップ用パーセンテージ
+  const [editorHeight, setEditorHeight] = useState(50) // モバイル用パーセンテージ
   const [isResizing, setIsResizing] = useState(false)
+  const [isMobile, setIsMobile] = useState(false)
   const containerRef = useRef<HTMLDivElement>(null)
 
+  // 画面サイズの変更を検出
   useEffect(() => {
-    const handleMouseMove = (e: MouseEvent) => {
+    const checkMobile = () => {
+      setIsMobile(window.innerWidth <= 768)
+    }
+
+    checkMobile()
+    window.addEventListener('resize', checkMobile)
+
+    return () => window.removeEventListener('resize', checkMobile)
+  }, [])
+
+  useEffect(() => {
+    const handleMove = (clientX: number, clientY: number) => {
       if (!isResizing || !containerRef.current) return
 
       const containerRect = containerRef.current.getBoundingClientRect()
-      const newWidth = ((e.clientX - containerRect.left) / containerRect.width) * 100
 
-      // 最小20%、最大80%に制限
-      if (newWidth >= 20 && newWidth <= 80) {
-        setEditorWidth(newWidth)
+      if (isMobile) {
+        // モバイル: 縦方向のリサイズ
+        const newHeight = ((clientY - containerRect.top) / containerRect.height) * 100
+        if (newHeight >= 20 && newHeight <= 80) {
+          setEditorHeight(newHeight)
+        }
+      } else {
+        // デスクトップ: 横方向のリサイズ
+        const newWidth = ((clientX - containerRect.left) / containerRect.width) * 100
+        if (newWidth >= 20 && newWidth <= 80) {
+          setEditorWidth(newWidth)
+        }
       }
     }
 
-    const handleMouseUp = () => {
+    const handleMouseMove = (e: MouseEvent) => {
+      handleMove(e.clientX, e.clientY)
+    }
+
+    const handleTouchMove = (e: TouchEvent) => {
+      if (e.touches.length > 0) {
+        handleMove(e.touches[0].clientX, e.touches[0].clientY)
+      }
+    }
+
+    const handleEnd = () => {
       setIsResizing(false)
     }
 
     if (isResizing) {
       document.addEventListener('mousemove', handleMouseMove)
-      document.addEventListener('mouseup', handleMouseUp)
+      document.addEventListener('mouseup', handleEnd)
+      document.addEventListener('touchmove', handleTouchMove)
+      document.addEventListener('touchend', handleEnd)
     }
 
     return () => {
       document.removeEventListener('mousemove', handleMouseMove)
-      document.removeEventListener('mouseup', handleMouseUp)
+      document.removeEventListener('mouseup', handleEnd)
+      document.removeEventListener('touchmove', handleTouchMove)
+      document.removeEventListener('touchend', handleEnd)
     }
-  }, [isResizing])
+  }, [isResizing, isMobile])
 
-  const handleResizerMouseDown = () => {
+  const handleResizerStart = (e: React.MouseEvent | React.TouchEvent) => {
+    e.preventDefault()
     setIsResizing(true)
   }
+
+  const editorStyle = isMobile
+    ? { height: `${editorHeight}%` }
+    : { width: `${editorWidth}%` }
+
+  const previewStyle = isMobile
+    ? { height: `${100 - editorHeight}%` }
+    : { width: `${100 - editorWidth}%` }
 
   return (
     <div className="app">
@@ -88,11 +133,14 @@ function App() {
         <h1>React Sandbox</h1>
         <p>お手本を見ながら React を練習しよう</p>
       </header>
-      <div className="app__container" ref={containerRef}>
+      <div
+        className={`app__container ${isMobile ? 'app__container--mobile' : ''}`}
+        ref={containerRef}
+      >
         <div
           className="app__editor-area"
           data-testid="editor-area"
-          style={{ width: `${editorWidth}%` }}
+          style={editorStyle}
         >
           <CodeEditor
             value={practiceCode}
@@ -102,13 +150,14 @@ function App() {
           />
         </div>
         <div
-          className="app__resizer"
+          className={`app__resizer ${isMobile ? 'app__resizer--mobile' : ''}`}
           data-testid="resizer"
-          onMouseDown={handleResizerMouseDown}
+          onMouseDown={handleResizerStart}
+          onTouchStart={handleResizerStart}
         />
         <div
           className="app__preview"
-          style={{ width: `${100 - editorWidth}%` }}
+          style={previewStyle}
         >
           <PreviewSection code={practiceCode} />
         </div>

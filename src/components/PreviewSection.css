@@ -18,3 +18,19 @@
   flex: 1;
   overflow: hidden;
 }
+
+/* モバイル対応 */
+@media (max-width: 768px) {
+  .preview-section__header {
+    padding: 8px 12px;
+    font-size: 12px;
+  }
+}
+
+/* 小さいモバイル端末 */
+@media (max-width: 480px) {
+  .preview-section__header {
+    padding: 6px 10px;
+    font-size: 11px;
+  }
+}
