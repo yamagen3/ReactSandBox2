@@ -1,4 +1,4 @@
-import React, { useEffect, useRef } from 'react'
+import React, { useEffect, useRef, useState } from 'react'
 import './Preview.css'
 
 interface PreviewProps {
@@ -8,9 +8,19 @@ interface PreviewProps {
 
 export const Preview: React.FC<PreviewProps> = ({ code, error }) => {
   const iframeRef = useRef<HTMLIFrameElement>(null)
+  const [debouncedCode, setDebouncedCode] = useState(code)
+
+  // デバウンス処理：入力が止まってから500ms後に更新
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      setDebouncedCode(code)
+    }, 500)
+
+    return () => clearTimeout(timer)
+  }, [code])
 
   useEffect(() => {
-    if (!code || error) return
+    if (!debouncedCode || error) return
 
     const iframe = iframeRef.current
     if (!iframe) return
@@ -53,7 +63,7 @@ export const Preview: React.FC<PreviewProps> = ({ code, error }) => {
 
                 const { useState, useEffect } = React;
 
-                ${code}
+                ${debouncedCode}
 
                 const rootElement = document.getElementById('root');
                 const root = ReactDOM.createRoot(rootElement);
@@ -86,7 +96,7 @@ export const Preview: React.FC<PreviewProps> = ({ code, error }) => {
     document.open()
     document.write(htmlContent)
     document.close()
-  }, [code, error])
+  }, [debouncedCode, error])
 
   if (error) {
     return (
@@ -112,7 +122,6 @@ export const Preview: React.FC<PreviewProps> = ({ code, error }) => {
   return (
     <div className="preview" data-testid="preview-container">
       <iframe
-        key={code}
         ref={iframeRef}
         className="preview__iframe"
         title="Preview"

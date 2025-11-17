@@ -72,16 +72,20 @@ function App() {
 
       if (isMobile) {
         // モバイル: 縦方向のリサイズ
-        const newHeight = ((clientY - containerRect.top) / containerRect.height) * 100
-        if (newHeight >= 20 && newHeight <= 80) {
-          setEditorHeight(newHeight)
-        }
+        // クライアント座標を制限して範囲外に出ないようにする
+        const clampedY = Math.max(containerRect.top, Math.min(clientY, containerRect.bottom))
+        const newHeight = ((clampedY - containerRect.top) / containerRect.height) * 100
+        // 20%〜80%の範囲に制限
+        const clampedHeight = Math.max(20, Math.min(80, newHeight))
+        setEditorHeight(clampedHeight)
       } else {
         // デスクトップ: 横方向のリサイズ
-        const newWidth = ((clientX - containerRect.left) / containerRect.width) * 100
-        if (newWidth >= 20 && newWidth <= 80) {
-          setEditorWidth(newWidth)
-        }
+        // クライアント座標を制限して範囲外に出ないようにする
+        const clampedX = Math.max(containerRect.left, Math.min(clientX, containerRect.right))
+        const newWidth = ((clampedX - containerRect.left) / containerRect.width) * 100
+        // 20%〜80%の範囲に制限
+        const clampedWidth = Math.max(20, Math.min(80, newWidth))
+        setEditorWidth(clampedWidth)
       }
     }
 
@@ -97,9 +101,14 @@ function App() {
 
     const handleEnd = () => {
       setIsResizing(false)
+      // ドラッグ終了時にテキスト選択を再度有効化
+      document.body.style.userSelect = ''
     }
 
     if (isResizing) {
+      // ドラッグ中はテキスト選択を無効化
+      document.body.style.userSelect = 'none'
+
       document.addEventListener('mousemove', handleMouseMove)
       document.addEventListener('mouseup', handleEnd)
       document.addEventListener('touchmove', handleTouchMove)
@@ -111,6 +120,8 @@ function App() {
       document.removeEventListener('mouseup', handleEnd)
       document.removeEventListener('touchmove', handleTouchMove)
       document.removeEventListener('touchend', handleEnd)
+      // クリーンアップ時にもテキスト選択を再度有効化
+      document.body.style.userSelect = ''
     }
   }, [isResizing, isMobile])
 
