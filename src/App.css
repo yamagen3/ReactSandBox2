@@ -33,22 +33,24 @@
   overflow: hidden;
 }
 
-/* 左側：エディタ領域 */
+/* 左側：エディタ領域（70%に拡大） */
 .app__editor-area {
-  flex: 1;
+  flex: 0 0 70%;
   display: flex;
   flex-direction: column;
   background-color: #ffffff;
   overflow: hidden;
+  height: 100%;
 }
 
-/* 右側：プレビュー領域 */
+/* 右側：プレビュー領域（30%に縮小） */
 .app__preview {
-  flex: 1;
+  flex: 0 0 30%;
   display: flex;
   flex-direction: column;
   background-color: #ffffff;
   overflow: hidden;
+  height: 100%;
 }
 
 /* レスポンシブ対応 */
