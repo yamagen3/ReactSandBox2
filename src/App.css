@@ -25,74 +25,46 @@
   opacity: 0.9;
 }
 
+/* PanelGroup コンテナ */
 .app__container {
   flex: 1;
-  display: flex;
-  gap: 1px;
   background-color: #ddd;
   overflow: hidden;
 }
 
-/* 左側：エディタ領域（リサイザブル） */
-.app__editor-area {
+/* Panel */
+.app__panel {
   display: flex;
   flex-direction: column;
   background-color: #ffffff;
   overflow: hidden;
-  height: 100%;
-  flex-shrink: 0;
 }
 
-/* リサイザー */
+/* リサイザー（react-resizable-panels用） */
 .app__resizer {
-  width: 4px;
   background-color: #ddd;
-  cursor: col-resize;
-  flex-shrink: 0;
   transition: background-color 0.2s;
-  user-select: none;
-  -webkit-user-select: none;
-  -moz-user-select: none;
-  -ms-user-select: none;
+  position: relative;
+}
+
+/* 横方向レイアウト用のリサイザー */
+.app__resizer[data-resize-handle-state] {
+  flex: 0 0 4px;
+  cursor: col-resize;
+}
+
+/* 縦方向レイアウト用のリサイザー */
+.app__container[data-panel-group-direction="vertical"] .app__resizer {
+  flex: 0 0 4px;
+  cursor: row-resize;
 }
 
 .app__resizer:hover {
   background-color: #667eea;
 }
 
-.app__resizer:active {
+.app__resizer[data-resize-handle-active] {
   background-color: #764ba2;
-}
-
-/* 右側：プレビュー領域（リサイザブル） */
-.app__preview {
-  display: flex;
-  flex-direction: column;
-  background-color: #ffffff;
-  overflow: hidden;
-  height: 100%;
-  flex-shrink: 0;
-}
-
-/* モバイル用レイアウト */
-.app__container--mobile {
-  flex-direction: column;
-}
-
-.app__container--mobile .app__editor-area,
-.app__container--mobile .app__preview {
-  width: 100% !important;
-}
-
-/* モバイル用リサイザー（横線、縦方向のリサイズ） */
-.app__resizer--mobile {
-  width: 100%;
-  height: 4px;
-  cursor: row-resize;
-  user-select: none;
-  -webkit-user-select: none;
-  -moz-user-select: none;
-  -ms-user-select: none;
 }
 
 /* レスポンシブ対応 */
