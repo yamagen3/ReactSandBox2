@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useState, useRef, useEffect } from 'react'
 import { CodeEditor } from './components/CodeEditor'
 import { PreviewSection } from './components/PreviewSection'
 import './App.css'
@@ -46,6 +46,41 @@ const App = Welcome
 
 function App() {
   const [practiceCode, setPracticeCode] = useState(INITIAL_PRACTICE_CODE)
+  const [editorWidth, setEditorWidth] = useState(70) // パーセンテージ
+  const [isResizing, setIsResizing] = useState(false)
+  const containerRef = useRef<HTMLDivElement>(null)
+
+  useEffect(() => {
+    const handleMouseMove = (e: MouseEvent) => {
+      if (!isResizing || !containerRef.current) return
+
+      const containerRect = containerRef.current.getBoundingClientRect()
+      const newWidth = ((e.clientX - containerRect.left) / containerRect.width) * 100
+
+      // 最小20%、最大80%に制限
+      if (newWidth >= 20 && newWidth <= 80) {
+        setEditorWidth(newWidth)
+      }
+    }
+
+    const handleMouseUp = () => {
+      setIsResizing(false)
+    }
+
+    if (isResizing) {
+      document.addEventListener('mousemove', handleMouseMove)
+      document.addEventListener('mouseup', handleMouseUp)
+    }
+
+    return () => {
+      document.removeEventListener('mousemove', handleMouseMove)
+      document.removeEventListener('mouseup', handleMouseUp)
+    }
+  }, [isResizing])
+
+  const handleResizerMouseDown = () => {
+    setIsResizing(true)
+  }
 
   return (
     <div className="app">
@@ -53,8 +88,12 @@ function App() {
         <h1>React Sandbox</h1>
         <p>お手本を見ながら React を練習しよう</p>
       </header>
-      <div className="app__container">
-        <div className="app__editor-area">
+      <div className="app__container" ref={containerRef}>
+        <div
+          className="app__editor-area"
+          data-testid="editor-area"
+          style={{ width: `${editorWidth}%` }}
+        >
           <CodeEditor
             value={practiceCode}
             onChange={setPracticeCode}
@@ -62,7 +101,15 @@ function App() {
             exampleCode={EXAMPLE_CODE}
           />
         </div>
-        <div className="app__preview">
+        <div
+          className="app__resizer"
+          data-testid="resizer"
+          onMouseDown={handleResizerMouseDown}
+        />
+        <div
+          className="app__preview"
+          style={{ width: `${100 - editorWidth}%` }}
+        >
           <PreviewSection code={practiceCode} />
         </div>
       </div>
