@@ -33,24 +33,41 @@
   overflow: hidden;
 }
 
-/* 左側：エディタ領域（70%に拡大） */
+/* 左側：エディタ領域（リサイザブル） */
 .app__editor-area {
-  flex: 0 0 70%;
   display: flex;
   flex-direction: column;
   background-color: #ffffff;
   overflow: hidden;
   height: 100%;
+  flex-shrink: 0;
 }
 
-/* 右側：プレビュー領域（30%に縮小） */
+/* リサイザー */
+.app__resizer {
+  width: 4px;
+  background-color: #ddd;
+  cursor: col-resize;
+  flex-shrink: 0;
+  transition: background-color 0.2s;
+}
+
+.app__resizer:hover {
+  background-color: #667eea;
+}
+
+.app__resizer:active {
+  background-color: #764ba2;
+}
+
+/* 右側：プレビュー領域（リサイザブル） */
 .app__preview {
-  flex: 0 0 30%;
   display: flex;
   flex-direction: column;
   background-color: #ffffff;
   overflow: hidden;
   height: 100%;
+  flex-shrink: 0;
 }
 
 /* レスポンシブ対応 */

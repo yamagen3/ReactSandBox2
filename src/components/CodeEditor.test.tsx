@@ -1,5 +1,5 @@
 import { describe, it, expect, vi } from 'vitest'
-import { render, screen } from '@testing-library/react'
+import { render, screen, fireEvent } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import { CodeEditor } from './CodeEditor'
 
@@ -84,6 +84,96 @@ describe('CodeEditor', () => {
       // 非表示
       await user.click(button)
       expect(screen.queryByText(/Example/)).not.toBeInTheDocument()
+    })
+  })
+
+  describe('VSCode風ショートカット機能', () => {
+    it('Tabキーでインデントが追加される', () => {
+      const handleChange = vi.fn()
+      render(<CodeEditor value="test" onChange={handleChange} />)
+
+      const textarea = screen.getByRole('textbox') as HTMLTextAreaElement
+      textarea.setSelectionRange(0, 0)
+
+      fireEvent.keyDown(textarea, { key: 'Tab', code: 'Tab' })
+
+      expect(handleChange).toHaveBeenCalled()
+      expect(handleChange).toHaveBeenCalledWith('  test')
+    })
+
+    it('Shift+Tabでインデントが削除される', () => {
+      const handleChange = vi.fn()
+      render(<CodeEditor value="  test" onChange={handleChange} />)
+
+      const textarea = screen.getByRole('textbox') as HTMLTextAreaElement
+      textarea.setSelectionRange(0, 0)
+
+      fireEvent.keyDown(textarea, { key: 'Tab', code: 'Tab', shiftKey: true })
+
+      expect(handleChange).toHaveBeenCalled()
+      expect(handleChange).toHaveBeenCalledWith('test')
+    })
+
+    it('Ctrl+/でコメントアウトされる', () => {
+      const handleChange = vi.fn()
+      render(<CodeEditor value="const x = 1" onChange={handleChange} />)
+
+      const textarea = screen.getByRole('textbox') as HTMLTextAreaElement
+      textarea.setSelectionRange(0, 0)
+
+      fireEvent.keyDown(textarea, { key: '/', code: 'Slash', ctrlKey: true })
+
+      expect(handleChange).toHaveBeenCalled()
+      expect(handleChange).toHaveBeenCalledWith('// const x = 1')
+    })
+
+    it('Ctrl+Dで現在行が複製される', () => {
+      const handleChange = vi.fn()
+      const testValue = 'const x = 1'
+      render(<CodeEditor value={testValue} onChange={handleChange} />)
+
+      const textarea = screen.getByRole('textbox') as HTMLTextAreaElement
+      textarea.setSelectionRange(0, 0)
+
+      fireEvent.keyDown(textarea, { key: 'd', code: 'KeyD', ctrlKey: true })
+
+      expect(handleChange).toHaveBeenCalled()
+      const expected = 'const x = 1\nconst x = 1'
+      expect(handleChange).toHaveBeenCalledWith(expected)
+    })
+
+    it('Ctrl+Shift+Kで現在行が削除される', () => {
+      const handleChange = vi.fn()
+      const testValue = `line1
+line2
+line3`
+      render(<CodeEditor value={testValue} onChange={handleChange} />)
+
+      const textarea = screen.getByRole('textbox') as HTMLTextAreaElement
+      // 2行目の先頭にカーソルを設定
+      textarea.setSelectionRange(6, 6) // "line1\n"の後
+
+      fireEvent.keyDown(textarea, { key: 'K', code: 'KeyK', ctrlKey: true, shiftKey: true })
+
+      expect(handleChange).toHaveBeenCalled()
+      const expected = `line1
+line3`
+      expect(handleChange).toHaveBeenCalledWith(expected)
+    })
+
+    it('Ctrl+Enterで改行が挿入される', () => {
+      const handleChange = vi.fn()
+      const testValue = 'test'
+      render(<CodeEditor value={testValue} onChange={handleChange} />)
+
+      const textarea = screen.getByRole('textbox') as HTMLTextAreaElement
+      textarea.setSelectionRange(0, 0)
+
+      fireEvent.keyDown(textarea, { key: 'Enter', code: 'Enter', ctrlKey: true })
+
+      expect(handleChange).toHaveBeenCalled()
+      const expected = 'test\n'
+      expect(handleChange).toHaveBeenCalledWith(expected)
     })
   })
 })
